@@ -23,14 +23,14 @@ void UWorldPosition::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	FString Log = TEXT("Hello!");
-	FString* PtrLog = &Log;
+	// FString Log = TEXT("Hello!");
+	// FString* PtrLog = &Log;
 
-	UE_LOG(LogTemp, Warning, TEXT("%s"), **PtrLog);
-	UE_LOG(LogTemp, Error, TEXT("%s"), *this->GetOwner()->GetActorLocation().ToString());
-	UE_LOG(LogTemp, Error, TEXT("%s"), *this->GetOwner()->GetActorLocation().ToCompactString());
-	UE_LOG(LogTemp, Error, TEXT("%s"), *this->GetOwner()->GetActorTransform().ToString());
-	UE_LOG(LogTemp, Error, TEXT("%s"), *this->GetOwner()->GetActorTransform().ToHumanReadableString());
+	// UE_LOG(LogTemp, Warning, TEXT("%s"), **PtrLog);
+	// UE_LOG(LogTemp, Error, TEXT("%s"), *this->GetOwner()->GetActorLocation().ToString());
+	// UE_LOG(LogTemp, Error, TEXT("%s"), *this->GetOwner()->GetActorLocation().ToCompactString());
+	// UE_LOG(LogTemp, Error, TEXT("%s"), *this->GetOwner()->GetActorTransform().ToString());
+	// UE_LOG(LogTemp, Error, TEXT("%s"), *this->GetOwner()->GetActorTransform().ToHumanReadableString());
 
 }
 
