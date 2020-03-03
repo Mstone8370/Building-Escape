@@ -30,5 +30,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float TargetYaw = 90.f;
-
+	UPROPERTY(EditAnywhere)
+	float DoorOpenSpeed = 1.f;
 };
