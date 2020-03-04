@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Engine/TriggerVolume.h"
+#include "Components/LightComponent.h"
 #include "OpenDoor.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -29,16 +30,18 @@ public:
 private:
 	float InitialYaw;
 	float CurrentYaw;
+	float DoorLastOpened;
+	AActor* ActorThatOpens;
 
 	UPROPERTY(EditAnywhere)
 	float TargetYaw = 90.f;
 
 	UPROPERTY(EditAnywhere)
-	float DoorOpenSpeed = 1.f;
+	float DoorSpeed = 1.f;
 
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PressurePlate;
 
 	UPROPERTY(EditAnywhere)
-	AActor* ActorThatOpens;
+	float DoorCloseDelay = 2.f;
 };

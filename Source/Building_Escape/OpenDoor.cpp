@@ -5,6 +5,7 @@
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Actor.h"
+#include "Math/Color.h"
 
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
@@ -47,23 +48,24 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 	if(PressurePlate != nullptr) {
 		if(PressurePlate->IsOverlappingActor(ActorThatOpens)) {
-			UE_LOG(LogTemp, Warning, TEXT("Enter"));
+			// UE_LOG(LogTemp, Warning, TEXT("Enter"));
 			OpenDoor(DeltaTime);
-		} else {
+			DoorLastOpened = this->GetWorld()->GetTimeSeconds();
+		} else if((this->GetWorld()->GetTimeSeconds() - DoorLastOpened) > DoorCloseDelay) {
 			CloseDoor(DeltaTime);
 		}
 	}
 }
 
 void UOpenDoor::OpenDoor(float DeltaTime) {
-	CurrentYaw = FMath::Lerp(CurrentYaw, TargetYaw, DeltaTime * DoorOpenSpeed);
+	CurrentYaw = FMath::Lerp(CurrentYaw, TargetYaw, DeltaTime * DoorSpeed);
 	FRotator DoorRotation = this->GetOwner()->GetActorRotation();
 	DoorRotation.Yaw = CurrentYaw;
 	this->GetOwner()->SetActorRotation(DoorRotation);
 }
 
 void UOpenDoor::CloseDoor(float DeltaTime) {
-	CurrentYaw = FMath::Lerp(CurrentYaw, InitialYaw, DeltaTime * DoorOpenSpeed);
+	CurrentYaw = FMath::Lerp(CurrentYaw, InitialYaw, DeltaTime * DoorSpeed * 2);
 	FRotator DoorRotation = this->GetOwner()->GetActorRotation();
 	DoorRotation.Yaw = CurrentYaw;
 	this->GetOwner()->SetActorRotation(DoorRotation);
