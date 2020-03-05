@@ -44,4 +44,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float DoorCloseDelay = 2.f;
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInstanceDynamic* dynamicMaterial;
 };
