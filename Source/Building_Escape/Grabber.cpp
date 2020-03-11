@@ -24,11 +24,23 @@ void UGrabber::BeginPlay()
 	// ...
 	// UE_LOG(LogTemp, Warning, TEXT("test"));
 	PhysicsHandle = this->GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-	if(PhysicsHandle == nullptr) {
-		UE_LOG(LogTemp, Error, TEXT("No PhysicsHandle found on %s"), *GetOwner()->GetName());
-	} else {
+	if(PhysicsHandle != nullptr) {
 		UE_LOG(LogTemp, Warning, TEXT("PhysicsHandle found"));
+	} else {
+		UE_LOG(LogTemp, Error, TEXT("No PhysicsHandle found on %s"), *GetOwner()->GetName());
 	}
+
+	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if(InputComponent != nullptr) {
+		UE_LOG(LogTemp, Warning, TEXT("Input Component found"));
+		InputComponent->BindAction(TEXT("Grab"), IE_Pressed, this, &UGrabber::Grab);
+	} else {
+		UE_LOG(LogTemp, Error, TEXT("No Input Component found on %s"), *GetOwner()->GetName());
+	}
+}
+
+void UGrabber::Grab() {
+	UE_LOG(LogTemp, Warning, TEXT("Grabber Pressed"));
 }
 
 
