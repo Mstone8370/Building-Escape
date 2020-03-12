@@ -26,7 +26,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	float Reach = 100.f;
+	float Reach = 200.f;
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 	UInputComponent* InputComponent = nullptr;
 
@@ -35,4 +35,6 @@ private:
 	void FindPhysicsHandle();
 	void SetupInputComponent();
 	FHitResult GetFirstPhysicsBodyInReach() const;
+	FVector GetPlayersReach() const;
+	FVector GetPlayersWorldPos() const;
 };
