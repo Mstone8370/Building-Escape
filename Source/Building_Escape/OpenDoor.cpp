@@ -1,6 +1,5 @@
 // Copyright test.
 
-
 #include "OpenDoor.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
@@ -16,7 +15,6 @@ UOpenDoor::UOpenDoor()
 
 	// ...
 }
-
 
 // Called when the game starts
 void UOpenDoor::BeginPlay()
@@ -35,7 +33,6 @@ void UOpenDoor::BeginPlay()
 	ActorThatOpens = this->GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
-
 // Called every frame
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -44,7 +41,6 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	// ...
 	// UE_LOG(LogTemp, Warning, TEXT("%s"), *this->GetOwner()->GetActorRotation().ToString());
 	// UE_LOG(LogTemp, Warning, TEXT("Yaw is: %f"), this->GetOwner()->GetActorRotation().Yaw);
-
 
 	if(PressurePlate != nullptr) {
 		if(PressurePlate->IsOverlappingActor(ActorThatOpens)) {

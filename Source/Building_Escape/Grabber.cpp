@@ -1,9 +1,9 @@
 // Copyright test.
 
-#include "GameFramework/PlayerController.h"
-#include "Engine/World.h"
-#include "DrawDebugHelpers.h"
 #include "Grabber.h"
+#include "DrawDebugHelpers.h"
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
@@ -45,12 +45,44 @@ void UGrabber::SetupInputComponent() {
 }
 
 void UGrabber::Grab() {
+	//
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	this->GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		PlayerViewPointLocation,
+		PlayerViewPointRotation
+	);
+
+	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
+	//
+
 	UE_LOG(LogTemp, Warning, TEXT("Grabber Pressed"));
-	GetFirstPhysicsBodyInReach();
+	
+	FHitResult HitResult = GetFirstPhysicsBodyInReach();
+	UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
+
+	if(HitResult.GetActor() != nullptr) {
+		// PhysicsHandle->GrabComponentAtLocation(
+		// 	ComponentToGrab,
+		// 	NAME_None,
+		// 	LineTraceEnd
+		// );
+		PhysicsHandle->GrabComponentAtLocationWithRotation(
+			ComponentToGrab,
+			NAME_None,
+			LineTraceEnd,
+			ComponentToGrab->GetOwner()->GetActorRotation()
+		);
+	}
 }
 
 void UGrabber::Release() {
 	UE_LOG(LogTemp, Warning, TEXT("Grabber Released"));
+
+	if(PhysicsHandle->GrabbedComponent != nullptr) {
+		PhysicsHandle->ReleaseComponent();
+	}
 }
 
 // Called every frame
@@ -59,7 +91,19 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	this->GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		PlayerViewPointLocation,
+		PlayerViewPointRotation
+	);
+
+	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
+
+	if(PhysicsHandle->GrabbedComponent != nullptr) {
+		PhysicsHandle->SetTargetLocation(LineTraceEnd);
+	}
 }
 
 FHitResult UGrabber::GetFirstPhysicsBodyInReach() const {
@@ -90,7 +134,7 @@ FHitResult UGrabber::GetFirstPhysicsBodyInReach() const {
 	if(ActorHit != nullptr) {
 		UE_LOG(LogTemp, Warning, TEXT("Line trace has hit: %s"), *ActorHit->GetName());
 	}
-	// end
+	// Debug end
 
 	return Hit;
 }
