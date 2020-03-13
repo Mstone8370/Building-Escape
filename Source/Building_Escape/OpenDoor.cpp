@@ -31,6 +31,8 @@ void UOpenDoor::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("%s has the OpenDoor component on it, but no PressurePlate set."), *this->GetOwner()->GetName());
 	}
 
+	FindAudioComponent();
+
 	// ActorThatOpens = this->GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
@@ -55,11 +57,24 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	}
 }
 
+void UOpenDoor::FindAudioComponent() {
+	AudioComponent = GetOwner()->FindComponentByClass<UAudioComponent>();
+
+	if(!AudioComponent) {
+		UE_LOG(LogTemp, Error, TEXT("Missing Audio Component: %s"), *GetOwner()->GetName());
+	}
+}
+
 void UOpenDoor::OpenDoor(float DeltaTime) {
 	CurrentAngle = FMath::Lerp(CurrentAngle, OpenAngle, DeltaTime * DoorOpenSpeed);
 	FRotator DoorRotation = this->GetOwner()->GetActorRotation();
 	DoorRotation.Yaw = CurrentAngle;
 	this->GetOwner()->SetActorRotation(DoorRotation);
+
+	if(AudioComponent && !IsOpen) {
+		AudioComponent->Play();
+		IsOpen = true;
+	}
 }
 
 void UOpenDoor::CloseDoor(float DeltaTime) {
@@ -67,6 +82,11 @@ void UOpenDoor::CloseDoor(float DeltaTime) {
 	FRotator DoorRotation = this->GetOwner()->GetActorRotation();
 	DoorRotation.Yaw = CurrentAngle;
 	this->GetOwner()->SetActorRotation(DoorRotation);
+
+	if(AudioComponent && IsOpen) {
+		AudioComponent->Play();
+		IsOpen = false;
+	}
 }
 
 float UOpenDoor::TotalMassOfActors() const {
