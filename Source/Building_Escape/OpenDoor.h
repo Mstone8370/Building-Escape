@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/AudioComponent.h"
+#include "Components/MeshComponent.h"
 #include "Engine/TriggerVolume.h"
+#include "Materials/MaterialInterface.h"
 #include "OpenDoor.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -39,8 +41,17 @@ private:
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PressurePlate = nullptr;
 
+	UPROPERTY(EditAnywhere)
+	AActor* ExitIndicator = nullptr;
+
 	UPROPERTY()
 	UAudioComponent* AudioComponent = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* ClosedMaterial = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* OpenedMaterial = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	float OpenAngle = 90.f;

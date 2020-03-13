@@ -71,9 +71,15 @@ void UOpenDoor::OpenDoor(float DeltaTime) {
 	DoorRotation.Yaw = CurrentAngle;
 	this->GetOwner()->SetActorRotation(DoorRotation);
 
-	if(AudioComponent && !IsOpen) {
-		AudioComponent->Play();
-		IsOpen = true;
+	if(!IsOpen) {
+		if(AudioComponent) {
+			AudioComponent->Play();
+			IsOpen = true;
+		}
+		if(ExitIndicator && OpenedMaterial) {
+			UMeshComponent* IndicatorMesh = ExitIndicator->FindComponentByClass<UMeshComponent>();
+			IndicatorMesh->SetMaterial(0, OpenedMaterial);
+		}
 	}
 }
 
@@ -83,9 +89,15 @@ void UOpenDoor::CloseDoor(float DeltaTime) {
 	DoorRotation.Yaw = CurrentAngle;
 	this->GetOwner()->SetActorRotation(DoorRotation);
 
-	if(AudioComponent && IsOpen) {
-		AudioComponent->Play();
-		IsOpen = false;
+	if(IsOpen) {
+		if(AudioComponent) {
+			AudioComponent->Play();
+			IsOpen = false;
+		}
+		if(ExitIndicator && ClosedMaterial) {
+			UMeshComponent* IndicatorMesh = ExitIndicator->FindComponentByClass<UMeshComponent>();
+			IndicatorMesh->SetMaterial(0, ClosedMaterial);
+		}
 	}
 }
 
