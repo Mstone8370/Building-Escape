@@ -31,10 +31,10 @@ private:
 	float InitialAngle;
 	float CurrentAngle;
 	float DoorLastOpened;
-	AActor* ActorThatOpens;
+	// AActor* ActorThatOpens = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* PressurePlate;
+	ATriggerVolume* PressurePlate = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	float OpenAngle = 90.f;

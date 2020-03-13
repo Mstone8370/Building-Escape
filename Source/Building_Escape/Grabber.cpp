@@ -45,6 +45,8 @@ void UGrabber::SetupInputComponent() {
 }
 
 void UGrabber::Grab() {
+	if(!PhysicsHandle) return;
+
 	UE_LOG(LogTemp, Warning, TEXT("Grabber Pressed"));
 	
 	FHitResult HitResult = GetFirstPhysicsBodyInReach();
@@ -67,6 +69,8 @@ void UGrabber::Grab() {
 }
 
 void UGrabber::Release() {
+	if(!PhysicsHandle) return;
+
 	UE_LOG(LogTemp, Warning, TEXT("Grabber Released"));
 
 	if(PhysicsHandle->GrabbedComponent != nullptr) {
@@ -79,7 +83,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if(PhysicsHandle->GrabbedComponent != nullptr) {
+	if(PhysicsHandle && PhysicsHandle->GrabbedComponent != nullptr) {
 		PhysicsHandle->SetTargetLocation(GetPlayersReach());
 	}
 }
@@ -123,7 +127,7 @@ FVector UGrabber::GetPlayersWorldPos() const {
 	FVector PlayerViewPointLocation;
 	FRotator PlayerViewPointRotation;
 
-	this->GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
 		PlayerViewPointLocation,
 		PlayerViewPointRotation
 	);
