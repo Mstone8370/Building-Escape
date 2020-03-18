@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/PrimitiveComponent.h"
+#include "DrawDebugHelpers.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Grabber.generated.h"
 
@@ -27,6 +28,7 @@ protected:
 
 private:
 	float Reach = 200.f;
+	float PrevPlayerYaw;
 
 	UPROPERTY()
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
@@ -41,4 +43,5 @@ private:
 	FHitResult GetFirstPhysicsBodyInReach() const;
 	FVector GetPlayersReach() const;
 	FVector GetPlayersWorldPos() const;
+	FRotator GetPlayersRot() const;
 };

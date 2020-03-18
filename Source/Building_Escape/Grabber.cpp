@@ -20,6 +20,7 @@ void UGrabber::BeginPlay()
 
 	FindPhysicsHandle();
 	SetupInputComponent();
+	PrevPlayerYaw = GetPlayersRot().Yaw;
 }
 
 void UGrabber::FindPhysicsHandle() {
@@ -53,10 +54,16 @@ void UGrabber::Grab() {
 	UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
 
 	if(HitResult.GetActor() != nullptr) {
+		HitResult.GetActor()->SetActorLocation(GetPlayersReach());
+
+		// AActor* ActorToGrab = ComponentToGrab->GetOwner();
+		// FRotator rot = ActorToGrab->GetActorRotation();
+		// ActorToGrab->SetActorRotation(rot);
+
 		// PhysicsHandle->GrabComponentAtLocation(
 		// 	ComponentToGrab,
 		// 	NAME_None,
-		// 	LineTraceEnd
+		// 	GetPlayersReach()
 		// );
 
 		PhysicsHandle->GrabComponentAtLocationWithRotation(
@@ -65,6 +72,13 @@ void UGrabber::Grab() {
 			GetPlayersReach(),
 			ComponentToGrab->GetOwner()->GetActorRotation()
 		);
+
+		// PhysicsHandle->GrabComponentAtLocationWithRotation(
+		// 	ComponentToGrab,
+		// 	NAME_None,
+		// 	GetPlayersReach(),
+		// 	rot
+		// );
 	}
 }
 
@@ -82,10 +96,21 @@ void UGrabber::Release() {
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	float NewPlayerYaw = GetPlayersRot().Yaw;
 
-	if(PhysicsHandle && PhysicsHandle->GrabbedComponent != nullptr) {
-		PhysicsHandle->SetTargetLocation(GetPlayersReach());
+	if(PhysicsHandle && PhysicsHandle->GetGrabbedComponent() != nullptr) {
+		DrawDebugPoint(GetWorld(), GetPlayersReach(), 50.f, FColor(255, 0, 0));
+		
+		float DeltaYaw = NewPlayerYaw - PrevPlayerYaw;
+		FRotator rot = PhysicsHandle->GetGrabbedComponent()->GetOwner()->GetActorRotation();
+		rot.Yaw += DeltaYaw;
+		
+		// PhysicsHandle->SetTargetLocation(GetPlayersReach());
+		// PhysicsHandle->SetTargetLocationAndRotation(GetPlayersReach(), PhysicsHandle->GetGrabbedComponent()->GetOwner()->GetActorRotation());
+		PhysicsHandle->SetTargetLocationAndRotation(GetPlayersReach(), rot);
 	}
+	
+	PrevPlayerYaw = NewPlayerYaw;
 }
 
 FHitResult UGrabber::GetFirstPhysicsBodyInReach() const {
@@ -133,4 +158,16 @@ FVector UGrabber::GetPlayersWorldPos() const {
 	);
 
 	return PlayerViewPointLocation;
+}
+
+FRotator UGrabber::GetPlayersRot() const {
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		PlayerViewPointLocation,
+		PlayerViewPointRotation
+	);
+
+	return PlayerViewPointRotation;
 }
