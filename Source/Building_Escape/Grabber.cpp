@@ -84,13 +84,13 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	float NewPlayerYaw = GetPlayersRot().Yaw;
 
 	if(PhysicsHandle && PhysicsHandle->GetGrabbedComponent() != nullptr) {
-		DrawDebugPoint(GetWorld(), GetPlayersReach(), 50.f, FColor(255, 0, 0));
-		
 		float DeltaYaw = NewPlayerYaw - PrevPlayerYaw;
-
 		GrabbedActorYaw += DeltaYaw;
 		
-		PhysicsHandle->SetTargetLocationAndRotation(GetPlayersReach(), FRotator(0.f, GrabbedActorYaw, 0.f));
+		PhysicsHandle->SetTargetLocationAndRotation(
+			GetPlayersReach(), 
+			FRotator(0.f, GrabbedActorYaw, 0.f)
+		);
 	}
 	
 	PrevPlayerYaw = NewPlayerYaw;
