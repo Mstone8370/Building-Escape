@@ -56,15 +56,7 @@ void UGrabber::Grab() {
 	if(HitResult.GetActor() != nullptr) {
 		HitResult.GetActor()->SetActorLocation(GetPlayersReach());
 
-		// AActor* ActorToGrab = ComponentToGrab->GetOwner();
-		// FRotator rot = ActorToGrab->GetActorRotation();
-		// ActorToGrab->SetActorRotation(rot);
-
-		// PhysicsHandle->GrabComponentAtLocation(
-		// 	ComponentToGrab,
-		// 	NAME_None,
-		// 	GetPlayersReach()
-		// );
+		GrabbedActorYaw = ComponentToGrab->GetOwner()->GetActorRotation().Yaw;
 
 		PhysicsHandle->GrabComponentAtLocationWithRotation(
 			ComponentToGrab,
@@ -72,13 +64,6 @@ void UGrabber::Grab() {
 			GetPlayersReach(),
 			ComponentToGrab->GetOwner()->GetActorRotation()
 		);
-
-		// PhysicsHandle->GrabComponentAtLocationWithRotation(
-		// 	ComponentToGrab,
-		// 	NAME_None,
-		// 	GetPlayersReach(),
-		// 	rot
-		// );
 	}
 }
 
@@ -102,12 +87,10 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		DrawDebugPoint(GetWorld(), GetPlayersReach(), 50.f, FColor(255, 0, 0));
 		
 		float DeltaYaw = NewPlayerYaw - PrevPlayerYaw;
-		FRotator rot = PhysicsHandle->GetGrabbedComponent()->GetOwner()->GetActorRotation();
-		rot.Yaw += DeltaYaw;
+
+		GrabbedActorYaw += DeltaYaw;
 		
-		// PhysicsHandle->SetTargetLocation(GetPlayersReach());
-		// PhysicsHandle->SetTargetLocationAndRotation(GetPlayersReach(), PhysicsHandle->GetGrabbedComponent()->GetOwner()->GetActorRotation());
-		PhysicsHandle->SetTargetLocationAndRotation(GetPlayersReach(), rot);
+		PhysicsHandle->SetTargetLocationAndRotation(GetPlayersReach(), FRotator(0.f, GrabbedActorYaw, 0.f));
 	}
 	
 	PrevPlayerYaw = NewPlayerYaw;

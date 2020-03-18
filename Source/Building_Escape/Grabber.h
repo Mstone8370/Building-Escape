@@ -29,6 +29,7 @@ protected:
 private:
 	float Reach = 200.f;
 	float PrevPlayerYaw;
+	float GrabbedActorYaw;
 
 	UPROPERTY()
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
