@@ -44,7 +44,7 @@ private:
 	FHitResult GetFirstPhysicsBodyInReach() const;
 	FVector GetPlayersReach() const;
 	FVector GetPlayersWorldPos() const;
-	FRotator GetPlayersRot() const;
+	FRotator GetPlayersRotation() const;
 	float GetOffsetYaw(float PlayerYaw, float ObjectYaw);
 	void HalfupRotation(FRotator& Rotation);
 	float HalfupValue(float val);

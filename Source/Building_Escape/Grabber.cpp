@@ -20,7 +20,7 @@ void UGrabber::BeginPlay()
 
 	FindPhysicsHandle();
 	SetupInputComponent();
-	PrevPlayerYaw = GetPlayersRot().Yaw;
+	PrevPlayerYaw = GetPlayersRotation().Yaw;
 }
 
 void UGrabber::FindPhysicsHandle() {
@@ -56,22 +56,10 @@ void UGrabber::Grab() {
 	if(HitResult.GetActor() != nullptr) {
 		HitResult.GetActor()->SetActorLocation(GetPlayersReach());
 
-		/*
-		 *	Offset이 90도인 경우 한바퀴 돌음. 만약 Offset이 90인 경우 GetOffsetYaw에서 0을 return 해야 함
-		 *	GetOffsetYaw에서 90으로 나눈 값을 return하는 경우 다른 방향에서 바라볼 때 같은 현상 나타남.
-		*/
 		FRotator TempRotation = ComponentToGrab->GetOwner()->GetActorRotation();
-		UE_LOG(LogTemp, Warning, TEXT("Original: %f, Player: %f"), TempRotation.Yaw, GetPlayersRot().Yaw);
-		TempRotation.Yaw = GetOffsetYaw(GetPlayersRot().Yaw, TempRotation.Yaw);
-		UE_LOG(LogTemp, Warning, TEXT("Offset: %f"), TempRotation.Yaw);
+		TempRotation.Yaw = GetOffsetYaw(GetPlayersRotation().Yaw, TempRotation.Yaw);
 		HalfupRotation(TempRotation);
-		UE_LOG(LogTemp, Warning, TEXT("After Halfup: %f"), TempRotation.Yaw);
-		/* PlayerYaw와 같은 값을 저장함
-		TempRotation.Yaw -= (int32)(TempRotation.Yaw / 90.f) * 90.f;
-		UE_LOG(LogTemp, Warning, TEXT("divide as 90: %f"), TempRotation.Yaw);
-		*/
-		TempRotation.Yaw += GetPlayersRot().Yaw;
-		UE_LOG(LogTemp, Warning, TEXT("Final: %f"), TempRotation.Yaw);
+		TempRotation.Yaw = GetPlayersRotation().Yaw - TempRotation.Yaw;
 		GrabbedActorRotation = TempRotation;
 
 		PhysicsHandle->GrabComponentAtLocationWithRotation(
@@ -104,7 +92,7 @@ void UGrabber::Release() {
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	float NewPlayerYaw = GetPlayersRot().Yaw;
+	float NewPlayerYaw = GetPlayersRotation().Yaw;
 
 	if(PhysicsHandle && PhysicsHandle->GetGrabbedComponent() != nullptr) {
 		float DeltaYaw = NewPlayerYaw - PrevPlayerYaw;
@@ -166,7 +154,7 @@ FVector UGrabber::GetPlayersWorldPos() const {
 	return PlayerViewPointLocation;
 }
 
-FRotator UGrabber::GetPlayersRot() const {
+FRotator UGrabber::GetPlayersRotation() const {
 	FVector PlayerViewPointLocation;
 	FRotator PlayerViewPointRotation;
 
