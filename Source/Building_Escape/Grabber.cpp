@@ -56,7 +56,23 @@ void UGrabber::Grab() {
 	if(HitResult.GetActor() != nullptr) {
 		HitResult.GetActor()->SetActorLocation(GetPlayersReach());
 
-		GrabbedActorYaw = ComponentToGrab->GetOwner()->GetActorRotation().Yaw;
+		/*
+		 *	Offset이 90도인 경우 한바퀴 돌음. 만약 Offset이 90인 경우 GetOffsetYaw에서 0을 return 해야 함
+		 *	GetOffsetYaw에서 90으로 나눈 값을 return하는 경우 다른 방향에서 바라볼 때 같은 현상 나타남.
+		*/
+		FRotator TempRotation = ComponentToGrab->GetOwner()->GetActorRotation();
+		UE_LOG(LogTemp, Warning, TEXT("Original: %f, Player: %f"), TempRotation.Yaw, GetPlayersRot().Yaw);
+		TempRotation.Yaw = GetOffsetYaw(GetPlayersRot().Yaw, TempRotation.Yaw);
+		UE_LOG(LogTemp, Warning, TEXT("Offset: %f"), TempRotation.Yaw);
+		HalfupRotation(TempRotation);
+		UE_LOG(LogTemp, Warning, TEXT("After Halfup: %f"), TempRotation.Yaw);
+		/* PlayerYaw와 같은 값을 저장함
+		TempRotation.Yaw -= (int32)(TempRotation.Yaw / 90.f) * 90.f;
+		UE_LOG(LogTemp, Warning, TEXT("divide as 90: %f"), TempRotation.Yaw);
+		*/
+		TempRotation.Yaw += GetPlayersRot().Yaw;
+		UE_LOG(LogTemp, Warning, TEXT("Final: %f"), TempRotation.Yaw);
+		GrabbedActorRotation = TempRotation;
 
 		PhysicsHandle->GrabComponentAtLocationWithRotation(
 			ComponentToGrab,
@@ -65,6 +81,13 @@ void UGrabber::Grab() {
 			ComponentToGrab->GetOwner()->GetActorRotation()
 		);
 	}
+}
+
+float UGrabber::GetOffsetYaw(float PlayerYaw, float ObjectYaw) {
+	if(ObjectYaw < 0) ObjectYaw += 360.f;
+	float Offset = PlayerYaw - ObjectYaw;
+	if(Offset <= -180.f) Offset += 360.f;
+	return Offset;
 }
 
 void UGrabber::Release() {
@@ -85,11 +108,11 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	if(PhysicsHandle && PhysicsHandle->GetGrabbedComponent() != nullptr) {
 		float DeltaYaw = NewPlayerYaw - PrevPlayerYaw;
-		GrabbedActorYaw += DeltaYaw;
+		GrabbedActorRotation.Yaw += DeltaYaw;
 		
 		PhysicsHandle->SetTargetLocationAndRotation(
 			GetPlayersReach(), 
-			FRotator(0.f, GrabbedActorYaw, 0.f)
+			GrabbedActorRotation
 		);
 	}
 	
@@ -153,4 +176,23 @@ FRotator UGrabber::GetPlayersRot() const {
 	);
 
 	return PlayerViewPointRotation;
+}
+
+void UGrabber::HalfupRotation(FRotator& Rotation) {
+	Rotation.Pitch = HalfupValue(Rotation.Pitch);
+	Rotation.Yaw = HalfupValue(Rotation.Yaw);
+	Rotation.Roll = HalfupValue(Rotation.Roll);
+}
+
+float UGrabber::HalfupValue(float val) {
+	float valAbs = (val >= 0) ? val : -val;
+
+	int32 mult = (int32)(valAbs / 90.f);
+	float reminder = valAbs - (mult * 90);
+	
+	if(val >= 0) {
+		return (reminder >= 45.f) ? (mult + 1) * 90.f : mult * 90.f;
+	} else {
+		return (reminder >= 45.f) ? -((mult + 1) * 90.f) : -(mult * 90.f);
+	}
 }

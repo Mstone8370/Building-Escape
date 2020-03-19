@@ -29,7 +29,7 @@ protected:
 private:
 	float Reach = 200.f;
 	float PrevPlayerYaw;
-	float GrabbedActorYaw;
+	FRotator GrabbedActorRotation;
 
 	UPROPERTY()
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
@@ -45,4 +45,7 @@ private:
 	FVector GetPlayersReach() const;
 	FVector GetPlayersWorldPos() const;
 	FRotator GetPlayersRot() const;
+	float GetOffsetYaw(float PlayerYaw, float ObjectYaw);
+	void HalfupRotation(FRotator& Rotation);
+	float HalfupValue(float val);
 };
