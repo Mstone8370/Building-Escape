@@ -20,7 +20,8 @@ void URotatorTest::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	GetOwner()->SetActorRotation(FRotator(0.f, 180.f, 0.f));
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *GetOwner()->GetActorRotation().ToString());
 }
 
 
@@ -30,10 +31,11 @@ void URotatorTest::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	FRotator Rotation = GetOwner()->GetActorRotation();
-	UE_LOG(LogTemp, Warning, TEXT("%f"), Rotation.Yaw);
 
-	Rotation.Yaw += val;
-	GetOwner()->SetActorRotation(Rotation);
+	// FRotator Rotation = GetOwner()->GetActorRotation();
+	// UE_LOG(LogTemp, Warning, TEXT("%f"), Rotation.Yaw);
+
+	// Rotation.Yaw += val;
+	// GetOwner()->SetActorRotation(Rotation);
 }
 

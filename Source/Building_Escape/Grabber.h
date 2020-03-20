@@ -37,6 +37,9 @@ private:
 	UPROPERTY()
 	UInputComponent* InputComponent = nullptr;
 
+	UPROPERTY(EditAnywhere)
+	float AdjustAngle = 25.f;
+
 	void Grab();
 	void Release();
 	void FindPhysicsHandle();
@@ -45,7 +48,9 @@ private:
 	FVector GetPlayersReach() const;
 	FVector GetPlayersWorldPos() const;
 	FRotator GetPlayersRotation() const;
-	float GetOffsetYaw(float PlayerYaw, float ObjectYaw);
+	FRotator AdjustGrabbedActorRotation(AActor* GrabbedActor);
+	float CalcOffsetYaw(float PlayerYaw, float ObjectYaw);
 	void HalfupRotation(FRotator& Rotation);
+	bool AdjustOrNot(float Yaw);
 	float HalfupValue(float val);
 };

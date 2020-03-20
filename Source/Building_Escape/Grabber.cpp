@@ -18,6 +18,7 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AdjustAngle = (AdjustAngle >= 0) ? AdjustAngle : -AdjustAngle;
 	FindPhysicsHandle();
 	SetupInputComponent();
 	PrevPlayerYaw = GetPlayersRotation().Yaw;
@@ -56,11 +57,7 @@ void UGrabber::Grab() {
 	if(HitResult.GetActor() != nullptr) {
 		HitResult.GetActor()->SetActorLocation(GetPlayersReach());
 
-		FRotator TempRotation = ComponentToGrab->GetOwner()->GetActorRotation();
-		TempRotation.Yaw = GetOffsetYaw(GetPlayersRotation().Yaw, TempRotation.Yaw);
-		HalfupRotation(TempRotation);
-		TempRotation.Yaw = GetPlayersRotation().Yaw - TempRotation.Yaw;
-		GrabbedActorRotation = TempRotation;
+		GrabbedActorRotation = AdjustGrabbedActorRotation(HitResult.GetComponent()->GetOwner());
 
 		PhysicsHandle->GrabComponentAtLocationWithRotation(
 			ComponentToGrab,
@@ -71,7 +68,16 @@ void UGrabber::Grab() {
 	}
 }
 
-float UGrabber::GetOffsetYaw(float PlayerYaw, float ObjectYaw) {
+FRotator UGrabber::AdjustGrabbedActorRotation(AActor* GrabbedActor) {
+	FRotator TempRotation = GrabbedActor->GetActorRotation();
+	TempRotation.Yaw = CalcOffsetYaw(GetPlayersRotation().Yaw, TempRotation.Yaw);
+	HalfupRotation(TempRotation);
+	TempRotation.Yaw = GetPlayersRotation().Yaw - TempRotation.Yaw;
+	
+	return TempRotation;
+}
+
+float UGrabber::CalcOffsetYaw(float PlayerYaw, float ObjectYaw) {
 	if(ObjectYaw < 0) ObjectYaw += 360.f;
 	float Offset = PlayerYaw - ObjectYaw;
 	if(Offset <= -180.f) Offset += 360.f;
@@ -168,8 +174,20 @@ FRotator UGrabber::GetPlayersRotation() const {
 
 void UGrabber::HalfupRotation(FRotator& Rotation) {
 	Rotation.Pitch = HalfupValue(Rotation.Pitch);
-	Rotation.Yaw = HalfupValue(Rotation.Yaw);
 	Rotation.Roll = HalfupValue(Rotation.Roll);
+	if(AdjustOrNot(Rotation.Yaw)) {
+		// UE_LOG(LogTemp, Warning, TEXT("TRUE: %f"), Rotation.Yaw);
+		Rotation.Yaw = HalfupValue(Rotation.Yaw);
+	} else {
+		// UE_LOG(LogTemp, Warning, TEXT("FALSE: %f"), Rotation.Yaw);
+	}
+}
+
+bool UGrabber::AdjustOrNot(float Yaw) {
+	return (-AdjustAngle <= Yaw && Yaw <= AdjustAngle) ||
+		(90.f - AdjustAngle <= Yaw && Yaw <= 90 + AdjustAngle) ||
+		(-90.f - AdjustAngle <= Yaw && Yaw <= -90.f + AdjustAngle) ||
+		(Yaw >= 180.f - AdjustAngle || Yaw <= -180.f + AdjustAngle);
 }
 
 float UGrabber::HalfupValue(float val) {
